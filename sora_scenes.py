@@ -276,12 +276,20 @@ openai = OpenAI()
 
 def generate_scene(scene, name_index):
     """Generate one Sora video scene and save it locally.
-       Returns the video.id so it can be used as a reference for the next scene.
+       Returns the video.id so you *could* track continuity, even though
+       we can't pass it back into videos.create() right now.
     """
     print(f"\n=== Generating scene: {NAMES[name_index]} ===")
 
+    # Make a shallow copy so we don't mutate the original scene
+    scene_args = dict(scene)
+
+    # SAFETY: remove any keys that the Videos API doesn't understand
+    # (like 'referenced_video_ids' which is NOT currently supported)
+    scene_args.pop("referenced_video_ids", None)
+
     # Submit the job
-    video = openai.videos.create(**scene)
+    video = openai.videos.create(**scene_args)
     print("Video generation started:", video)
 
     # Progress bar setup
@@ -322,33 +330,24 @@ def generate_scene(scene, name_index):
 
     print(f"Wrote {filename}")
 
-    # Return the video id so the next scene can reference it
+    # Return the video id (for your own tracking, logging, etc.)
     return video.id
 
 
 def main():
     print("Starting batch generation for all scenes...")
 
-    prev_video_id = None  # will hold the last generated scene's video.id
+    prev_video_id = None  # you can still log this for yourself
     name_index = 0
 
     for scene in SCENES:
-        # Make a shallow copy so we don't mutate the original SCENES entry
-        scene_args = dict(scene)
+        # If you *want* to keep track of continuity yourself, you can store
+        # prev_video_id somewhere or print it, but we won't send it to the API.
+        video_id = generate_scene(scene, name_index)
 
-        # If we have a previous video, pass it as a reference to encourage continuity
-        if prev_video_id is not None:
-            scene_args["referenced_video_ids"] = [prev_video_id]
-        else:
-            # For the very first scene, don't send any references
-            scene_args.pop("referenced_video_ids", None)
-
-        # Generate the scene and get back its video.id
-        video_id = generate_scene(scene_args, name_index)
-
-        # Only chain if generation succeeded
         if video_id is not None:
             prev_video_id = video_id
+            print(f"Scene {NAMES[name_index]} completed as video id: {video_id}")
 
         name_index += 1
 
