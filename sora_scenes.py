@@ -21,183 +21,157 @@ openai = OpenAI()
 # Shared continuity context for all scenes
 
 CONTEXT = """
-[CONTEXT — SAME SHORT FILM]
-This clip is part of a single unified sci-fi ham-radio promo short
-about a phone-based Morse code key with haptic sidetone.
+[CONTEXT — SAME SHORT CARTOON FILM]
+This is a single, unified, lighthearted 1950s-style cartoon short about
+a ham-radio haptic sidetone app.
 
-Keep these elements CONSISTENT across scenes:
-- Same pilot character:
-  - mid-30s, short brown hair
-  - orange retro-futuristic flight suit
-  - same face, same proportions, same general expression style
-- Same starfighter cockpit:
-  - retro-futuristic analog-meets-holographic design
-  - physical switches, metal panels, plus a few floating HUD elements
-- Overall look:
-  - vertical smartphone video (6:19 / 9:16 style)
-  - cinematic, slightly stylized realism
-  - rich contrast, cool sci-fi blues with warm orange highlights
-- IMPORTANT: Do NOT render any readable on-screen text or titles.
+Visual style:
+- Two cheerful cartoon kids in a vintage kids' comic style:
+  * Red-haired kid: round face, red bowl-cut hair, green-and-white striped shirt,
+    bright yellow shorts with suspenders, round shoes.
+  * Blonde kid: long ponytail tied with a big ribbon,
+    blue dress and tiny academic cap, white socks and shoes.
+- A small brown puppy sidekick that behaves like a friendly little robot:
+  wagging tail, cheerful face, sometimes beeping or flashing tiny lights.
+- Thick black outlines, soft shading, warm retro-paper texture.
+- The tone is upbeat, curious, friendly, and imaginative.
+- IMPORTANT: Do NOT draw any readable on-screen text or captions.
 """
 
 SCENES = [
-    # SCENE 1 — no reference image defined here
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
+    # SCENE 1 – no reference needed, though optional refimg_0 is supported
+{
+    "model": "sora-2",
+    "seconds": "8",
+    "size": "720x1280",
+    "prompt": f"""
 {CONTEXT}
 
-[SCENE 1 — HOOK: SIDETONE MISERY, USE REFERENCE IMAGE IF AVAILABLE]
-
-Vertical 6:19 / 9:16 smartphone video. We’re in a modern ham radio shack at a small desk.
-A ham operator (this is the same person who will become the starfighter pilot later),
-wearing over-ear wireless headphones, is trying to send Morse code
-with a paddle or cootie key.
-
-Close-up: their hand keying on the desk and their face reacting.
-The sidetone in their headphones is obviously delayed: finger taps are in-time,
-but the audible beeps come a fraction of a second late, creating an annoying echo.
-
-Camera: handheld close-ups on the key and the operator’s frustrated face,
-with subtle focus pulls and slight camera shake to add tension.
-
-We hear the operator’s delayed sidetone beeps and a frustrated sigh or groan.
-Their body language clearly shows annoyance with the lagging feedback.
-""".strip(),
-        # No reference metadata for scene 1; scene 1 may optionally use refimg_0.png
-        # via the main() logic.
-    },
-
-    # SCENE 2 — uses refimg_0.png from Scene 
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 2 — STARFIGHTER FREAKOUT, USE REFERENCE IMAGE FROM SCENE 1]
-
-Vertical 6:19 / 9:16. Inside a small, cramped retro-futuristic starfighter cockpit,
-clearly inspired by classic space dogfight movies but with no specific franchise logos.
-
-The same pilot character is now flying a sci-fi fighter. Outside the canopy,
-we see stylized enemy ships and stars streaking by.
-
-The pilot wears a sci-fi flight helmet with built-in wireless audio.
-We hear delayed Morse sidetone echoing in their ears as they try to key
-on an in-cockpit Morse control.
-
-Camera: medium close-up on the pilot, cockpit shaking slightly from turbulence.
-
-The pilot shouts in frustration:
-“Damn it, I can’t transmit with this sidetone delay!”
-
-They rip off their helmet dramatically, revealing the same face as in the other scenes,
-hair slightly mussed, clearly exasperated.
-""".strip(),
-        "reference_filename": "refimg_0.png",
-        "reference_instructions": (
-            "From Scene 1 (01_haptic_sidetone_hook_operator.mp4), capture a frame where the "
-            "operator’s full face is clearly visible with the wireless headphones on. "
-            "Good lighting on eyes and hair; a mid-close shot that establishes their look. "
-            "Avoid any UI overlays or text if present."
-        ),
-    },
-
-    # SCENE 3 — uses refimg_2.png from Scene 2
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 3 — MENTOR VOICE: USE THE HAPTICS, USE REFERENCE IMAGE FROM SCENE 2]
-
-Vertical 6:19 / 9:16. Same starfighter cockpit, same pilot.
-
-A reference still image from Scene 2 is provided.
-Use the reference image to MATCH:
-- cockpit layout, materials, and color
-- pilot’s flight suit and facial features
-- lighting direction and palette
-
-The chaotic battle noise ducks down slightly.
-The pilot looks around, a bit desperate but now helmet-off.
-
-A calm, distant mentor voice (Obi-Wan-like, but generic and unnamed) echoes gently:
-“Close your ears… Open your fingers to the code… Use the haptics.”
-
-As the voice says “Close your ears…”, a pair of soft, padded ear muffs
-materialize over the pilot’s ears from thin air with a gentle magical glow.
-All external sound becomes muffled, like real ear protection.
-
-As the voice says “Open your fingers to the code… Use the haptics,”
-we see a subtle glow tracing around the pilot’s fingers on the control stick,
-as if a new sense is awakening in their fingertips.
-
-Camera: slow push-in on the pilot’s face as they move from frustration
-to calm focus and curiosity.
-
-No written text or captions should appear anywhere in the cockpit.
-""".strip(),
-        "reference_filename": "refimg_1.png",
-        "reference_instructions": (
-            "From Scene 2 (02_starfighter_pilot_sidetone_delay.mp4), grab a frame right after "
-            "the helmet comes off where the pilot’s full face, suit, and cockpit background are "
-            "clearly visible. Emphasize face, suit color, and the metal panels behind them. "
-            "Avoid any frames where text or HUD labels appear."
-        ),
-    },
-
-    # SCENE 4 — uses refimg_3.png from Scene 3
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 4 — PEEL TRANSITION TO PHONE COOTIE KEY, USE REFERENCE IMAGE FROM SCENE 3]
+[SCENE 1 — RADIO SHACK, FRUSTRATING SIDETONE MISMATCH]
 
 Vertical 6:19 / 9:16.
 
-We start tight on the pilot’s glowing fingers in the cockpit.
+Inside a cozy, friendly cartoon ham radio shack, the red-haired kid
+sits confidently at their station — clearly experienced with radios
+and Morse code. They wear wireless headphones and send a clean,
+steady rhythm on a Morse paddle.
 
-A reference still image from Scene 3 is provided.
-Use the reference image to MATCH:
-- finger position and glow style
-- general cockpit color tones
-- the feeling that we are continuing directly from the previous shot
+The audio sidetone in the headphones comes through slightly late in an
+obvious, unintended mismatch. The kid reacts with a natural,
+non-harmful expression of frustration — eyebrows down, cheeks puffed,
+a quick, irritated exhale. Not distressed, just annoyed at bad gear.
 
-As the glowing fingers move slightly, the entire sci-fi cockpit scene PEELS AWAY
-like a translucent sticker, revealing a real-world desk underneath.
+The blonde kid stands nearby, also a skilled operator, watching with a
+knowing “yeah, we've all seen this issue” look. The robo-puppy emits a
+sympathetic electronic chirp.
 
-Underneath is a smartphone lying flat on a desk, running a phone-based cootie key app.
+The red-haired kid tries to keep timing steady, but the delayed sidetone
+throws them off. Their reaction is authentic and competent — they know
+exactly what’s wrong and why it’s happening.
 
-Close-up macro shot: a finger floating just above a large horizontal “key bar”
-UI on the screen, rocking gently side to side in cootie-key fashion.
-Each tap triggers a subtle screen animation and an implied haptic vibration.
+A friendly narrator can say:
+“Have problems with transmit sidetone delay in wireless headphones? Who doesn’t?
+Just turn off the audio sidetone… and FEEL the code with haptic sidetone mode!”
+""".strip(),
+    # No reference file for Scene 1
+},
 
-The UI should be abstract and icon-based, with shapes and visual indicators
-suggesting haptic mode is active, but with no readable words or text labels.
-No recognizable app store icons or real-world logos.
+    # SCENE 2 – requires refimg_1.png (frame from scene 1)
+{
+    "model": "sora-2",
+    "seconds": "8",
+    "size": "720x1280",
+    "prompt": f"""
+{CONTEXT}
 
-We hear soft, bassy, tactile “thunk” haptic sounds rather than loud beeps.
-No written text overlays should appear in the frame.
+[SCENE 2 — FANTASY STARFIGHTER COCKPIT, CARTOON VERSION]
+
+Vertical 6:19 / 9:16.
+
+The scene transitions into the red-haired kid’s imaginative fantasy:
+a dramatic, cinematic sci-fi starfighter cockpit inspired by classic
+space-adventure films (X-Wing / TIE Fighter style), but depicted as a
+bright, playful cartoon environment with no danger or combat.
+
+Cockpit details:
+- angular windows,
+- glowing panels,
+- flight sticks,
+- harmless laser indicators,
+- stars streaking by outside.
+No enemies, no battles — purely imaginative flight.
+
+A reference still from Scene 1 is provided. Use it to match the kid’s:
+- hair,
+- face,
+- clothing colors,
+keeping strong continuity.
+
+The red-haired kid now plays the role of a serious “space pilot”
+inside this imaginary craft. They try to send Morse using a
+cartoon flight-console paddle.
+
+The delayed sidetone returns — the same technical annoyance as in
+Scene 1. The kid reacts authentically with a frustrated outburst that
+shows they know exactly what’s wrong:
+
+They shout:
+"Darn it, I can’t transmit with this sidetone delay!"
+
+They yank off their space-helmet in a dramatic cartoon gesture —
+not violent, just expressive — revealing the same determined, competent
+ham-radio kid beneath.
+
+The blonde kid appears as a faint hologram in the cockpit, calm and
+supportive, clearly also an experienced operator.
+
+The robo-puppy appears in the cockpit as a small astromech-style
+sidekick, blinking lights sympathetically.
+""".strip(),
+    "reference_filename": "refimg_1.png",
+    "reference_instructions": (
+        "From Scene 1, capture a frame showing the red-haired kid's full face "
+        "with clear expression and lighting. Save as refimg_1.png."
+    )
+},
+
+    # SCENE 3 – requires refimg_2.png (frame from scene 2)
+    {
+        "model": "sora-2",
+        "seconds": "8",
+        "size": "720x1280",
+        "prompt": f"""
+{CONTEXT}
+
+[SCENE 3 — GENTLE MENTOR VOICE AND HAPTIC MAGIC]
+
+Vertical 6:19 / 9:16.
+
+Same rounded cartoon star cruiser, same red-haired kid.
+
+A reference still image from Scene 2 is provided. Use it to match:
+- cockpit layout,
+- colors,
+- character proportions.
+
+A soft, friendly mentor-style narrator’s voice floats in with cheerful warmth:
+“Close your ears… open your fingers to the code… try the haptics.”
+
+Soft glowing cartoon ear-muffs drift gently into place over the kid’s headphones,
+sparkling lightly. The red-haired kid’s fingertips glow with a warm pulse as
+though gaining a new, fun sense.
+
+The robo-puppy beeps and wiggles happily, matching the cheerful vibe.
 """.strip(),
         "reference_filename": "refimg_2.png",
         "reference_instructions": (
-            "From Scene 3 (03_mentor_voice_use_the_haptics.mp4), capture a close shot where the "
-            "ear muffs and glowing fingers on the control stick are visible together. The glow, "
-            "hand pose, and cockpit color are what matter most. Avoid any visible text or labels."
+            "From Scene 2 (02_starfighter_pilot_sidetone_delay.mp4), grab a frame showing "
+            "the red-haired kid in the cockpit with good facial visibility and the bubble-cockpit "
+            "background. Save as refimg_2.png."
         ),
     },
 
-    # SCENE 5 — uses refimg_4.png from Scene 4
+    # SCENE 4 – requires refimg_3.png (frame from scene 3)
     {
         "model": "sora-2",
         "seconds": "8",
@@ -205,84 +179,104 @@ No written text overlays should appear in the frame.
         "prompt": f"""
 {CONTEXT}
 
-[SCENE 5 — PILOT SENDING KD0FNR IN MORSE, USE REFERENCE IMAGE FROM SCENE 4]
-
-Vertical 6:19 / 9:16. Back in the same starfighter cockpit.
-
-A reference still image from Scene 4 is provided.
-Use the reference image to MATCH:
-- the look of the hand and finger position from the phone cootie key
-- overall color palette and lighting vibe
-- the sense that the pilot’s “haptic” sense is now integrated into the cockpit
-
-The pilot now sits calmly, eyes closed, ear muffs still on.
-No more echo or delay. Their hand rests on an invisible haptic key
-in front of them, rocking gently side to side as they send Morse code.
-
-We hear clean, perfectly timed Morse beeps (no delay), with the rhythm corresponding
-to the ham callsign KD0FNR, but nothing is written on screen.
-
-Camera: slow orbit around the pilot, showing starlight and HUD reflections
-on the canopy, conveying control and confidence.
-
-Mood: triumphant, nerdy, precise.
-No on-screen text, captions, or HUD words should appear.
-""".strip(),
-        "reference_filename": "refimg_3.png",
-        "reference_instructions": (
-            "From Scene 4 (04_phone_cootie_key_transition.mp4), grab a macro shot where a single "
-            "finger is clearly hovering over or touching the horizontal cootie key bar, with the "
-            "phone edges and key bar shape visible. The haptic gesture and UI bar are key. "
-            "Avoid any frames where UI text appears."
-        ),
-    },
-
-    # SCENE 6 — uses refimg_5.png from Scene 5
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 6 — STARSHIP BOOST & APP CTA, USE REFERENCE IMAGE FROM SCENE 5]
+[SCENE 4 — PEEL TRANSITION TO REAL PHONE COOTIE KEY]
 
 Vertical 6:19 / 9:16.
 
-A reference still image from Scene 5 is provided.
-Use the reference image to MATCH:
-- starfighter design
-- pilot suit colors and overall color palette
+We start tight on the glowing fingertip of the cartoon red-haired kid touching the
+cartoon Morse key.
 
-Exterior shot in space of the same starfighter seen before.
+A reference still image from Scene 3 is provided. Match:
+- the glowing finger style,
+- cockpit lighting,
+- character proportions.
 
-The ship suddenly accelerates up and away past the camera
-with a dramatic burst of light, leaving behind a short trail of glowing
-dots and dashes, like stylized Morse code, to suggest speed and perfect timing.
+The entire cartoon cockpit gently peels away like a sticker to reveal a real-world desk.
 
-Cut briefly to inside the cockpit: the pilot throws a fist in the air
-and shouts joyfully:
-“Whoooo, oh yeah!”
+A real human finger hovers over a Project TouCans–style haptic cootie key UI on a phone.
+The UI is abstract and icon-based (no text). Each tap produces a soft ripple animation,
+suggesting haptic feedback.
 
-Match cut to a clean dark-blue or black background.
+Bright, friendly lighting keeps the tone connected to the cartoon world.
+""".strip(),
+        "reference_filename": "refimg_3.png",
+        "reference_instructions": (
+            "From Scene 3 (03_mentor_voice_use_the_haptics.mp4), capture a frame showing "
+            "the glowing fingertip and cockpit background together. Avoid any visible text. "
+            "Save as refimg_3.png."
+        ),
+    },
 
-In front of this background, we see a 3D smartphone mockup showing the phone-based
-cootie key app UI. The UI should be abstract, with shapes, icons, and a visual
-indicator suggesting haptic vibrations, but with no readable text anywhere.
+    # SCENE 5 – requires refimg_4.png (frame from scene 4)
+    {
+        "model": "sora-2",
+        "seconds": "8",
+        "size": "720x1280",
+        "prompt": f"""
+{CONTEXT}
 
-Subtle animation:
-- A small haptic vibration icon or pattern near the phone pulses gently.
-- Very faint, repeating dots and dashes in the background as a Morse-like pattern,
-  but not forming any readable letters or numbers.
+[SCENE 5 — HAPPY HAPTIC MORSE IN STAR CRUISER]
 
-No written titles, captions, or labels should appear in the scene.
+Vertical 6:19 / 9:16.
+
+Back in the cartoon star cruiser.
+
+A reference image from Scene 4 is provided. Match:
+- the glowing fingertip vibe,
+- soft lighting,
+- general proportions of the kid.
+
+The red-haired kid now has the glowing ear-muffs and glowing fingertips.
+They happily tap an invisible Morse key on the console. The rhythm corresponds
+to KD0FNR but NOTHING should be written onscreen.
+
+The blonde kid smiles proudly from the mission-control screen.
+The robo-puppy bounces in place, beeping cheerfully in rhythm.
+
+The camera gently orbits to show the warm glow and colorful cockpit.
 """.strip(),
         "reference_filename": "refimg_4.png",
         "reference_instructions": (
-            "From Scene 5 (05_pilot_kd0fnr_morse_typewriter.mp4), capture a frame where the pilot "
-            "is calm in the cockpit with ear muffs visible and some stars / HUD elements reflected "
-            "on the canopy. Suit color and cockpit metal should be clear, and there should be no "
-            "visible text or labels in the shot."
+            "From Scene 4 (04_phone_cootie_key_transition.mp4), capture a macro-style frame "
+            "of the real finger over the haptic phone UI showing the horizontal key bar clearly. "
+            "Save as refimg_4.png."
+        ),
+    },
+
+    # SCENE 6 – requires refimg_5.png (frame from scene 5)
+    {
+        "model": "sora-2",
+        "seconds": "8",
+        "size": "720x1280",
+        "prompt": f"""
+{CONTEXT}
+
+[SCENE 6 — CARTOON BOOST & PHONE HERO SHOT]
+
+Vertical 6:19 / 9:16.
+
+A reference image from Scene 5 is provided. Match:
+- the cockpit color palette,
+- the red-haired kid’s appearance,
+- soft glowy lighting.
+
+The friendly cartoon star cruiser gently swooshes upward in space with a trail
+of sparkly Morse-like dots and dashes (no readable letters).
+
+Inside, the two kids cheer with joy. The robo-puppy beeps and wiggles excitedly.
+
+Match-cut to a clean hero shot: a real smartphone centered in frame against a
+soft dark-blue background. On the screen is the haptic cootie key UI (icons only,
+NO readable text).
+
+Soft floating vibration icons or waves appear around the phone.
+The feeling is warm, modern, and fun.
+""".strip(),
+        "reference_filename": "refimg_5.png",
+        "reference_instructions": (
+            "From Scene 5 (05_pilot_kd0fnr_morse_typewriter.mp4), capture a frame showing "
+            "the cartoon cockpit with the red-haired kid, ear-muffs, and glowing fingertips "
+            "clearly visible. Save as refimg_5.png."
         ),
     },
 ]
