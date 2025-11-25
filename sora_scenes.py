@@ -41,6 +41,35 @@ Keep these elements CONSISTENT across scenes:
 """
 
 SCENES = [
+    # SCENE 1 — no reference image defined here
+    {
+        "model": "sora-2",
+        "seconds": "8",
+        "size": "720x1280",
+        "prompt": f"""
+{CONTEXT}
+
+[SCENE 1 — HOOK: SIDETONE MISERY, USE REFERENCE IMAGE IF AVAILABLE]
+
+Vertical 6:19 / 9:16 smartphone video. We’re in a modern ham radio shack at a small desk.
+A ham operator (this is the same person who will become the starfighter pilot later),
+wearing over-ear wireless headphones, is trying to send Morse code
+with a paddle or cootie key.
+
+Close-up: their hand keying on the desk and their face reacting.
+The sidetone in their headphones is obviously delayed: finger taps are in-time,
+but the audible beeps come a fraction of a second late, creating an annoying echo.
+
+Camera: handheld close-ups on the key and the operator’s frustrated face,
+with subtle focus pulls and slight camera shake to add tension.
+
+We hear the operator’s delayed sidetone beeps and a frustrated sigh or groan.
+Their body language clearly shows annoyance with the lagging feedback.
+""".strip(),
+        # No reference metadata for scene 1; scene 1 may optionally use refimg_0.png
+        # via the main() logic.
+    },
+
     # SCENE 2 — uses refimg_0.png from Scene 
     {
         "model": "sora-2",
@@ -51,35 +80,23 @@ SCENES = [
 
 [SCENE 2 — STARFIGHTER FREAKOUT, USE REFERENCE IMAGE FROM SCENE 1]
 
-Vertical 6:19 / 9:16.
+Vertical 6:19 / 9:16. Inside a small, cramped retro-futuristic starfighter cockpit,
+clearly inspired by classic space dogfight movies but with no specific franchise logos.
 
-A retro-futuristic starfighter cockpit in space, inspired by classic space dogfight movies
-but with no specific franchise logos.
-
-This is the SAME character as in Scene 1, now as a sci-fi pilot.
-
-A reference still image from Scene 1 is provided.
-Use the reference image to MATCH:
-- the pilot’s face and hair
-- overall color palette and lighting mood
-- the sense that this is the same person in a different environment
-
-The pilot sits in a cramped cockpit. Outside the canopy we see stylized enemy ships
-and starfields.
+The same pilot character is now flying a sci-fi fighter. Outside the canopy,
+we see stylized enemy ships and stars streaking by.
 
 The pilot wears a sci-fi flight helmet with built-in wireless audio.
-We hear delayed Morse sidetone echoing in their ears while they try to key
+We hear delayed Morse sidetone echoing in their ears as they try to key
 on an in-cockpit Morse control.
 
 Camera: medium close-up on the pilot, cockpit shaking slightly from turbulence.
-The pilot’s expression is clearly frustrated.
 
-They shout in frustration:
+The pilot shouts in frustration:
 “Damn it, I can’t transmit with this sidetone delay!”
 
-They rip off their helmet dramatically, revealing the same face as the ham operator
-from Scene 1, hair slightly mussed, clearly exasperated.
-No readable words or titles appear anywhere in the frame.
+They rip off their helmet dramatically, revealing the same face as in the other scenes,
+hair slightly mussed, clearly exasperated.
 """.strip(),
         "reference_filename": "refimg_0.png",
         "reference_instructions": (
@@ -271,6 +288,7 @@ No written titles, captions, or labels should appear in the scene.
 ]
 
 NAMES = [
+    "01_haptic_sidetone_hook_operator",
     "02_starfighter_pilot_sidetone_delay",
     "03_mentor_voice_use_the_haptics",
     "04_phone_cootie_key_transition",
