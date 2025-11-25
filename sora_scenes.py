@@ -3,6 +3,7 @@ import time
 import sys
 from pathlib import Path
 import json
+import io
 from PIL import Image
 
 import requests
@@ -11,34 +12,13 @@ from openai import OpenAI
 # Directory to save all generated clips
 OUTPUT_DIR = Path("sora_gladych_cwhaptics_scenes")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+INITIAL_REFERENCE_FILENAME = "refimg_0.png"
 
 # All the Sora prompts we defined for the short
 
 openai = OpenAI()
 
 # Shared continuity context for all scenes
-CONTEXT = """
-[CONTEXT — SAME SHORT FILM]
-This clip is part of the same unified sci-fi ham-radio promo short about
-a phone-based Morse code key with haptic sidetone.
-
-Keep the visual style, color palette, and character designs consistent
-across all shots.
-
-Pilot:
-- mid-30s, short brown hair
-- orange retro-futuristic flight suit
-- same face, same proportions every time
-
-Starfighter cockpit:
-- retro-futuristic analog-meets-holographic design
-- lots of physical switches and metal, plus a few floating HUD elements
-
-Overall look:
-- vertical smartphone video (6:19 / 9:16 style)
-- cinematic, slightly stylized realism
-- rich contrast, cool sci-fi blues with warm orange highlights
-"""
 
 CONTEXT = """
 [CONTEXT — SAME SHORT FILM]
@@ -57,46 +37,11 @@ Keep these elements CONSISTENT across scenes:
   - vertical smartphone video (6:19 / 9:16 style)
   - cinematic, slightly stylized realism
   - rich contrast, cool sci-fi blues with warm orange highlights
+- IMPORTANT: Do NOT render any readable on-screen text or titles.
 """
 
 SCENES = [
-    # SCENE 1 — no reference image
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 1 — HOOK: SIDETONE MISERY, NO REFERENCE IMAGE]
-
-Vertical 6:19 / 9:16 smartphone video.
-
-We’re in a modern ham radio shack at a small desk.
-A ham operator (this is the same person who will become the starfighter pilot later),
-wearing over-ear wireless headphones, is trying to send Morse code
-with a paddle or cootie key.
-
-Close-up: their hand keying on the desk and their face reacting.
-The sidetone in their headphones is obviously delayed: finger taps are in-time,
-but the audible beeps come a fraction of a second late, creating an annoying echo.
-
-Camera: handheld close-ups on the key and the operator’s frustrated face,
-with subtle focus pulls.
-
-On-screen text at top:
-“Have problems with transmit sidetone delay in your wireless headphones?”
-
-Voiceover narrator (clear, friendly):
-“Have problems with transmit sidetone delay in your wireless headphones? Who doesn’t?”
-
-At the end of the shot, the operator winces and grabs the headphones
-in frustration as the echoing sidetone continues.
-""".strip(),
-        # no reference for scene 1
-    },
-
-    # SCENE 2 — uses refimg_1.png from Scene 1
+    # SCENE 2 — uses refimg_0.png from Scene 
     {
         "model": "sora-2",
         "seconds": "8",
@@ -127,18 +72,21 @@ We hear delayed Morse sidetone echoing in their ears while they try to key
 on an in-cockpit Morse control.
 
 Camera: medium close-up on the pilot, cockpit shaking slightly from turbulence.
+The pilot’s expression is clearly frustrated.
 
-The pilot shouts in frustration:
+They shout in frustration:
 “Damn it, I can’t transmit with this sidetone delay!”
 
 They rip off their helmet dramatically, revealing the same face as the ham operator
 from Scene 1, hair slightly mussed, clearly exasperated.
+No readable words or titles appear anywhere in the frame.
 """.strip(),
-        "reference_filename": "refimg_1.png",
+        "reference_filename": "refimg_0.png",
         "reference_instructions": (
             "From Scene 1 (01_haptic_sidetone_hook_operator.mp4), capture a frame where the "
             "operator’s full face is clearly visible with the wireless headphones on. "
-            "Good lighting on eyes and hair; a mid-close shot that establishes their look."
+            "Good lighting on eyes and hair; a mid-close shot that establishes their look. "
+            "Avoid any UI overlays or text if present."
         ),
     },
 
@@ -176,12 +124,15 @@ as if a new sense is awakening in their fingertips.
 
 Camera: slow push-in on the pilot’s face as they move from frustration
 to calm focus and curiosity.
+
+No written text or captions should appear anywhere in the cockpit.
 """.strip(),
-        "reference_filename": "refimg_2.png",
+        "reference_filename": "refimg_1.png",
         "reference_instructions": (
             "From Scene 2 (02_starfighter_pilot_sidetone_delay.mp4), grab a frame right after "
             "the helmet comes off where the pilot’s full face, suit, and cockpit background are "
-            "clearly visible. Emphasize face, suit color, and the metal panels behind them."
+            "clearly visible. Emphasize face, suit color, and the metal panels behind them. "
+            "Avoid any frames where text or HUD labels appear."
         ),
     },
 
@@ -203,37 +154,29 @@ A reference still image from Scene 3 is provided.
 Use the reference image to MATCH:
 - finger position and glow style
 - general cockpit color tones
-- the feel that we are continuing directly from the previous shot
+- the feeling that we are continuing directly from the previous shot
 
 As the glowing fingers move slightly, the entire sci-fi cockpit scene PEELS AWAY
 like a translucent sticker, revealing a real-world desk underneath.
 
-Underneath is a smartphone lying flat on a desk, running the
-Project Toucans phone-based cootie key app.
+Underneath is a smartphone lying flat on a desk, running a phone-based cootie key app.
 
 Close-up macro shot: a finger floating just above a large horizontal “key bar”
 UI on the screen, rocking gently side to side in cootie-key fashion.
 Each tap triggers a subtle screen animation and an implied haptic vibration.
 
-The phone screen shows a small, clear label:
-“HAPTIC SIDETONE MODE: ON” near the top corner.
-
-Show simple text “Project Toucans” near the bottom as branding,
-but no existing copyrighted logos.
+The UI should be abstract and icon-based, with shapes and visual indicators
+suggesting haptic mode is active, but with no readable words or text labels.
+No recognizable app store icons or real-world logos.
 
 We hear soft, bassy, tactile “thunk” haptic sounds rather than loud beeps.
-
-On-screen text at bottom:
-“Just turn audio sidetone off… and FEEL the code.”
-
-Voiceover narrator:
-“Just turn your audio transmit sidetone off… and feel the code with the app’s haptic sidetone mode.”
+No written text overlays should appear in the frame.
 """.strip(),
-        "reference_filename": "refimg_3.png",
+        "reference_filename": "refimg_2.png",
         "reference_instructions": (
             "From Scene 3 (03_mentor_voice_use_the_haptics.mp4), capture a close shot where the "
             "ear muffs and glowing fingers on the control stick are visible together. The glow, "
-            "hand pose, and cockpit color are what matter most."
+            "hand pose, and cockpit color are what matter most. Avoid any visible text or labels."
         ),
     },
 
@@ -257,25 +200,23 @@ Use the reference image to MATCH:
 
 The pilot now sits calmly, eyes closed, ear muffs still on.
 No more echo or delay. Their hand rests on an invisible haptic key
-in front of them, rocking gently side to side as they send Morse.
+in front of them, rocking gently side to side as they send Morse code.
 
-We hear clean, perfectly timed Morse beeps (no delay),
-spelling the callsign KD0FNR.
-
-As each character is sent, letters appear center-screen, one by one,
-in a vintage typewriter font, as if typed across the cockpit view:
-“K D 0 F N R”.
+We hear clean, perfectly timed Morse beeps (no delay), with the rhythm corresponding
+to the ham callsign KD0FNR, but nothing is written on screen.
 
 Camera: slow orbit around the pilot, showing starlight and HUD reflections
 on the canopy, conveying control and confidence.
 
 Mood: triumphant, nerdy, precise.
+No on-screen text, captions, or HUD words should appear.
 """.strip(),
-        "reference_filename": "refimg_4.png",
+        "reference_filename": "refimg_3.png",
         "reference_instructions": (
             "From Scene 4 (04_phone_cootie_key_transition.mp4), grab a macro shot where a single "
             "finger is clearly hovering over or touching the horizontal cootie key bar, with the "
-            "phone edges and key bar shape visible. The haptic gesture and UI bar are key."
+            "phone edges and key bar shape visible. The haptic gesture and UI bar are key. "
+            "Avoid any frames where UI text appears."
         ),
     },
 
@@ -308,30 +249,28 @@ and shouts joyfully:
 
 Match cut to a clean dark-blue or black background.
 
-Centered on screen:
-- A 3D smartphone mockup showing the Project Toucans phone-based cootie key UI
-  with “Haptic Sidetone Mode: ON” clearly visible.
-- App title text: “Project Toucans Haptic Sidetone”
-- Tagline text underneath:
-  “Send better code on wireless headphones. No sidetone delay. Just haptics.”
-- At the very bottom, small CTA text:
-  “Learn more at projecttoucans.com”
+In front of this background, we see a 3D smartphone mockup showing the phone-based
+cootie key app UI. The UI should be abstract, with shapes, icons, and a visual
+indicator suggesting haptic vibrations, but with no readable text anywhere.
 
 Subtle animation:
-- A small haptic vibration icon near the phone pulses gently.
-- Very faint, repeating KD0FNR in Morse (dots and dashes) as a background pattern.
+- A small haptic vibration icon or pattern near the phone pulses gently.
+- Very faint, repeating dots and dashes in the background as a Morse-like pattern,
+  but not forming any readable letters or numbers.
+
+No written titles, captions, or labels should appear in the scene.
 """.strip(),
-        "reference_filename": "refimg_5.png",
+        "reference_filename": "refimg_4.png",
         "reference_instructions": (
             "From Scene 5 (05_pilot_kd0fnr_morse_typewriter.mp4), capture a frame where the pilot "
             "is calm in the cockpit with ear muffs visible and some stars / HUD elements reflected "
-            "on the canopy. Suit color and cockpit metal should be clear."
+            "on the canopy. Suit color and cockpit metal should be clear, and there should be no "
+            "visible text or labels in the shot."
         ),
     },
 ]
 
 NAMES = [
-    "01_haptic_sidetone_hook_operator",
     "02_starfighter_pilot_sidetone_delay",
     "03_mentor_voice_use_the_haptics",
     "04_phone_cootie_key_transition",
@@ -346,8 +285,10 @@ openai = OpenAI()
 def prepare_reference_file(reference_filename: str, size_str: str):
     """
     Load the reference image, resize it to match the requested video size
-    (e.g. '720x1280'), and return a file-like object suitable for input_reference.
-    Returns None if anything goes wrong.
+    (e.g. '720x1280'), save as a PNG temp file, and return an open file handle.
+
+    Returning a real file handle with a .png extension ensures the OpenAI client
+    sets the correct mimetype (image/png) instead of application/octet-stream.
     """
     if not os.path.exists(reference_filename):
         print(f"WARNING: reference file {reference_filename} not found.")
@@ -376,14 +317,24 @@ def prepare_reference_file(reference_filename: str, size_str: str):
         )
         img = img.resize((target_width, target_height), Image.LANCZOS)
 
-    # Put into an in-memory buffer as PNG
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    buf.seek(0)
+    # Save to a temporary PNG file on disk so the client sees a proper filename
+    ref_path = Path(reference_filename)
+    temp_path = ref_path.with_name(ref_path.stem + "_sora_ref.png")
 
-    # Return the buffer; OpenAI client can treat this as a file-like for upload
-    return buf
+    try:
+        img.save(temp_path, format="PNG")
+    except Exception as e:
+        print(f"WARNING: Could not save resized reference image to {temp_path}: {e}")
+        return None
 
+    # Return an open file handle; caller is responsible for closing
+    try:
+        f = open(temp_path, "rb")
+    except Exception as e:
+        print(f"WARNING: Could not reopen temp reference image {temp_path}: {e}")
+        return None
+
+    return f
 
 
 def generate_scene(scene, name_index, reference_filename=None):
@@ -413,6 +364,10 @@ def generate_scene(scene, name_index, reference_filename=None):
     # Submit the job
     video = openai.videos.create(**scene_args)
     print("Video generation started:", video)
+
+    if ref_file is not None:
+        ref_file.close()
+
 
     # Progress bar setup
     bar_length = 30
@@ -456,27 +411,41 @@ def main():
     name_index = 0
     total_scenes = len(SCENES)
 
+    # Check once at startup if we have an optional initial reference for Scene 1
+    initial_reference = None
+    if os.path.exists(INITIAL_REFERENCE_FILENAME):
+        initial_reference = INITIAL_REFERENCE_FILENAME
+        print(f"Optional initial reference found: {INITIAL_REFERENCE_FILENAME}")
+    else:
+        print("No initial reference image found for Scene 1 (refimg_0.png). Proceeding without it.")
+
     for idx, scene in enumerate(SCENES):
-        # If this scene requires a continuity reference image, wait for it
-        reference_filename = scene.get("reference_filename")
+        # Decide which reference file (if any) to use for this scene
+        if idx == 0:
+            # Scene 1: optional initial reference, no polling
+            reference_filename = initial_reference
+        else:
+            # Scenes 2..N: use the scene's configured continuity reference, with waiting
+            reference_filename = scene.get("reference_filename")
 
-        if reference_filename:
-            print(f"\nWaiting for continuity reference image: {reference_filename}")
-            print("This scene expects an image file to guide visual continuity.")
+            if reference_filename:
+                print(f"\nWaiting for continuity reference image: {reference_filename}")
+                print("This scene expects an image file to guide visual continuity.")
 
-            # Print the instructions again for convenience
-            instructions = scene.get("reference_instructions")
-            if instructions:
-                print("\nReference instructions for this scene:")
-                print(instructions)
+                instructions = scene.get("reference_instructions")
+                if instructions:
+                    print("\nReference instructions for this scene:")
+                    print(instructions)
 
-            # Poll until the file exists
-            while not os.path.exists(reference_filename):
-                sys.stdout.write(f"  ... still waiting for {reference_filename} (press Ctrl+C to abort)\r")
-                sys.stdout.flush()
-                time.sleep(3)
+                # Poll until the file exists
+                while not os.path.exists(reference_filename):
+                    sys.stdout.write(
+                        f"  ... still waiting for {reference_filename} (press Ctrl+C to abort)\r"
+                    )
+                    sys.stdout.flush()
+                    time.sleep(3)
 
-            print(f"\nFound reference file {reference_filename}. Proceeding with generation.")
+                print(f"\nFound reference file {reference_filename}. Proceeding with generation.")
 
         # Generate the current scene
         video_id = generate_scene(scene, name_index, reference_filename=reference_filename)
@@ -490,7 +459,7 @@ def main():
             next_ref = next_scene.get("reference_filename")
             if next_ref:
                 print("\n----------------------------------------")
-                print(f"NEXT STEP: Prepare continuity reference for the next scene.")
+                print("NEXT STEP: Prepare continuity reference for the next scene.")
                 print(f"Please grab a still from {NAMES[idx]}.mp4 and save it as: {next_ref}")
                 next_instructions = next_scene.get("reference_instructions")
                 if next_instructions:
