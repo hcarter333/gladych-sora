@@ -3,6 +3,7 @@ import time
 import sys
 from pathlib import Path
 import json
+from PIL import Image
 
 import requests
 from openai import OpenAI
@@ -342,6 +343,49 @@ NAMES = [
 # Make sure you have OPENAI_API_KEY set in your environment.
 openai = OpenAI()
 
+def prepare_reference_file(reference_filename: str, size_str: str):
+    """
+    Load the reference image, resize it to match the requested video size
+    (e.g. '720x1280'), and return a file-like object suitable for input_reference.
+    Returns None if anything goes wrong.
+    """
+    if not os.path.exists(reference_filename):
+        print(f"WARNING: reference file {reference_filename} not found.")
+        return None
+
+    try:
+        # Parse size like "720x1280"
+        width_str, height_str = size_str.lower().split("x")
+        target_width = int(width_str.strip())
+        target_height = int(height_str.strip())
+    except Exception as e:
+        print(f"WARNING: Could not parse size '{size_str}': {e}")
+        return None
+
+    try:
+        img = Image.open(reference_filename).convert("RGB")
+    except Exception as e:
+        print(f"WARNING: Could not open reference image {reference_filename}: {e}")
+        return None
+
+    # Resize if needed
+    if img.size != (target_width, target_height):
+        print(
+            f"Resizing reference image {reference_filename} "
+            f"from {img.size} to {(target_width, target_height)}"
+        )
+        img = img.resize((target_width, target_height), Image.LANCZOS)
+
+    # Put into an in-memory buffer as PNG
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+
+    # Return the buffer; OpenAI client can treat this as a file-like for upload
+    return buf
+
+
+
 def generate_scene(scene, name_index, reference_filename=None):
     """Generate one Sora video scene and save it locally.
        Optionally uses a reference image file for continuity.
@@ -355,26 +399,19 @@ def generate_scene(scene, name_index, reference_filename=None):
     scene_args.pop("reference_filename", None)
     scene_args.pop("reference_instructions", None)
 
-    file_handle = None
+    # Prepare input_reference if requested
+    ref_buffer = None
     if reference_filename:
-        if os.path.exists(reference_filename):
-            try:
-                file_handle = open(reference_filename, "rb")
-                # Sora-2: pass continuity image as `input_reference`
-                scene_args["input_reference"] = file_handle
-                print(f"Using input_reference file: {reference_filename}")
-            except Exception as e:
-                print(f"WARNING: Could not open reference file {reference_filename}: {e}")
+        size_str = scene_args.get("size", "720x1280")
+        print(f"Using input_reference file: {reference_filename}")
+        ref_buffer = prepare_reference_file(reference_filename, size_str)
+        if ref_buffer is not None:
+            scene_args["input_reference"] = ref_buffer
         else:
-            print(f"WARNING: reference file {reference_filename} not found; continuing without it.")
+            print("Continuing without input_reference due to preparation failure.")
 
     # Submit the job
     video = openai.videos.create(**scene_args)
-
-    # Close the file handle after the request is made
-    if file_handle is not None:
-        file_handle.close()
-
     print("Video generation started:", video)
 
     # Progress bar setup
@@ -410,6 +447,7 @@ def generate_scene(scene, name_index, reference_filename=None):
 
     print(f"Wrote {filename}")
     return video.id
+
 
 
 def main():
