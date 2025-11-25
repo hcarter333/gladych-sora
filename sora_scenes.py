@@ -338,36 +338,39 @@ def prepare_reference_file(reference_filename: str, size_str: str):
 
 
 def generate_scene(scene, name_index, reference_filename=None):
-    """Generate one Sora video scene and save it locally.
-       Optionally uses a reference image file for continuity.
+    """
+    Generate one Sora video scene and save it locally.
+    Optionally uses a reference image file for continuity via input_reference.
     """
     print(f"\n=== Generating scene: {NAMES[name_index]} ===")
 
-    # Make a shallow copy so we don't mutate global SCENES
+    # Make a shallow copy so we don't mutate the global SCENES entry
     scene_args = dict(scene)
 
     # Remove metadata keys the Videos API doesn't understand
     scene_args.pop("reference_filename", None)
     scene_args.pop("reference_instructions", None)
 
-    # Prepare input_reference if requested
-    ref_buffer = None
+    # Optional continuity reference file
+    ref_file = None
     if reference_filename:
         size_str = scene_args.get("size", "720x1280")
         print(f"Using input_reference file: {reference_filename}")
-        ref_buffer = prepare_reference_file(reference_filename, size_str)
-        if ref_buffer is not None:
-            scene_args["input_reference"] = ref_buffer
+        ref_file = prepare_reference_file(reference_filename, size_str)
+        if ref_file is not None:
+            # Pass the opened PNG/JPEG handle to Sora as input_reference
+            scene_args["input_reference"] = ref_file
         else:
             print("Continuing without input_reference due to preparation failure.")
 
-    # Submit the job
+    # Submit the job to Sora-2
     video = openai.videos.create(**scene_args)
-    print("Video generation started:", video)
 
+    # Close the reference file handle if we opened one
     if ref_file is not None:
         ref_file.close()
 
+    print("Video generation started:", video)
 
     # Progress bar setup
     bar_length = 30
@@ -388,6 +391,7 @@ def generate_scene(scene, name_index, reference_filename=None):
 
     sys.stdout.write("\n")
 
+    # Handle failure
     if video.status == "failed":
         message = getattr(getattr(video, "error", None), "message", "Video generation failed")
         print(message)
