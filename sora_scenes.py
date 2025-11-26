@@ -40,136 +40,6 @@ Visual style:
 
 SCENES = [
     # SCENE 1 – no reference needed, though optional refimg_0 is supported
-{
-    "model": "sora-2",
-    "seconds": "8",
-    "size": "720x1280",
-    "prompt": f"""
-{CONTEXT}
-
-[SCENE 1 — RADIO SHACK, FRUSTRATING SIDETONE MISMATCH]
-
-Vertical 6:19 / 9:16.
-
-Inside a cozy, friendly cartoon ham radio shack, the red-haired kid
-sits confidently at their station — clearly experienced with radios
-and Morse code. They wear wireless headphones and send a clean,
-steady rhythm on a Morse paddle.
-
-The audio sidetone in the headphones comes through slightly late in an
-obvious, unintended mismatch. The kid reacts with a natural,
-non-harmful expression of frustration — eyebrows down, cheeks puffed,
-a quick, irritated exhale. Not distressed, just annoyed at bad gear.
-
-The blonde kid stands nearby, also a skilled operator, watching with a
-knowing “yeah, we've all seen this issue” look. The robo-puppy emits a
-sympathetic electronic chirp.
-
-The red-haired kid tries to keep timing steady, but the delayed sidetone
-throws them off. Their reaction is authentic and competent — they know
-exactly what’s wrong and why it’s happening.
-
-A friendly narrator can say:
-“Have problems with transmit sidetone delay in wireless headphones? Who doesn’t?
-Just turn off the audio sidetone… and FEEL the code with haptic sidetone mode!”
-""".strip(),
-    # No reference file for Scene 1
-},
-
-    # SCENE 2 – requires refimg_1.png (frame from scene 1)
-{
-    "model": "sora-2",
-    "seconds": "8",
-    "size": "720x1280",
-    "prompt": f"""
-{CONTEXT}
-
-[SCENE 2 — FANTASY STARFIGHTER COCKPIT, CARTOON VERSION]
-
-Vertical 6:19 / 9:16.
-
-The scene transitions into the red-haired kid’s imaginative fantasy:
-a dramatic, cinematic sci-fi starfighter cockpit inspired by classic
-space-adventure films (X-Wing / TIE Fighter style), but depicted as a
-bright, playful cartoon environment with no danger or combat.
-
-Cockpit details:
-- angular windows,
-- glowing panels,
-- flight sticks,
-- harmless laser indicators,
-- stars streaking by outside.
-No enemies, no battles — purely imaginative flight.
-
-A reference still from Scene 1 is provided. Use it to match the kid’s:
-- hair,
-- face,
-- clothing colors,
-keeping strong continuity.
-
-The red-haired kid now plays the role of a serious “space pilot”
-inside this imaginary craft. They try to send Morse using a
-cartoon flight-console paddle.
-
-The delayed sidetone returns — the same technical annoyance as in
-Scene 1. The kid reacts authentically with a frustrated outburst that
-shows they know exactly what’s wrong:
-
-They shout:
-"Darn it, I can’t transmit with this sidetone delay!"
-
-They yank off their space-helmet in a dramatic cartoon gesture —
-not violent, just expressive — revealing the same determined, competent
-ham-radio kid beneath.
-
-The blonde kid appears as a faint hologram in the cockpit, calm and
-supportive, clearly also an experienced operator.
-
-The robo-puppy appears in the cockpit as a small astromech-style
-sidekick, blinking lights sympathetically.
-""".strip(),
-    "reference_filename": "refimg_1.png",
-    "reference_instructions": (
-        "From Scene 1, capture a frame showing the red-haired kid's full face "
-        "with clear expression and lighting. Save as refimg_1.png."
-    )
-},
-
-    # SCENE 3 – requires refimg_2.png (frame from scene 2)
-    {
-        "model": "sora-2",
-        "seconds": "8",
-        "size": "720x1280",
-        "prompt": f"""
-{CONTEXT}
-
-[SCENE 3 — GENTLE MENTOR VOICE AND HAPTIC MAGIC]
-
-Vertical 6:19 / 9:16.
-
-Same rounded cartoon star cruiser, same red-haired kid.
-
-A reference still image from Scene 2 is provided. Use it to match:
-- cockpit layout,
-- colors,
-- character proportions.
-
-A soft, friendly mentor-style narrator’s voice floats in with cheerful warmth:
-“Close your ears… open your fingers to the code… try the haptics.”
-
-Soft glowing cartoon ear-muffs drift gently into place over the kid’s headphones,
-sparkling lightly. The red-haired kid’s fingertips glow with a warm pulse as
-though gaining a new, fun sense.
-
-The robo-puppy beeps and wiggles happily, matching the cheerful vibe.
-""".strip(),
-        "reference_filename": "refimg_2.png",
-        "reference_instructions": (
-            "From Scene 2 (02_starfighter_pilot_sidetone_delay.mp4), grab a frame showing "
-            "the red-haired kid in the cockpit with good facial visibility and the bubble-cockpit "
-            "background. Save as refimg_2.png."
-        ),
-    },
 
     # SCENE 4 – requires refimg_3.png (frame from scene 3)
     {
@@ -199,11 +69,11 @@ suggesting haptic feedback.
 
 Bright, friendly lighting keeps the tone connected to the cartoon world.
 """.strip(),
-        "reference_filename": "refimg_3.png",
+        "reference_filename": "refimg_0.png",
         "reference_instructions": (
             "From Scene 3 (03_mentor_voice_use_the_haptics.mp4), capture a frame showing "
             "the glowing fingertip and cockpit background together. Avoid any visible text. "
-            "Save as refimg_3.png."
+            "Save as refimg_0.png."
         ),
     },
 
@@ -282,9 +152,6 @@ The feeling is warm, modern, and fun.
 ]
 
 NAMES = [
-    "01_haptic_sidetone_hook_operator",
-    "02_starfighter_pilot_sidetone_delay",
-    "03_mentor_voice_use_the_haptics",
     "04_phone_cootie_key_transition",
     "05_pilot_kd0fnr_morse_typewriter",
     "06_starship_boost_and_app_cta",
